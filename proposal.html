@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제안서 작성 에이전트 — Build-For-All</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent-nrf: #3b82f6;
+    --accent-biz: #10b981;
+    --accent-startup: #f59e0b;
+    --text: #e2e0db;
+    --text-dim: #6b7280;
+    --text-muted: #374151;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── 헤더 ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: #f0ede8;
+  }
+
+  .logo span { color: var(--text-dim); font-weight: 400; }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .dl-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 14px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+
+  .dl-btn:hover { border-color: #888; color: var(--text); }
+  .dl-btn.primary {
+    background: #f0ede8;
+    color: #0a0a0f;
+    border-color: #f0ede8;
+    font-weight: 600;
+  }
+  .dl-btn.primary:hover { opacity: 0.9; }
+
+  /* ── 메인 레이아웃 ── */
+  .container {
+    display: flex;
+    flex: 1;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 28px 20px;
+    gap: 24px;
+  }
+
+  /* ── 사이드바 ── */
+  .sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 18px;
+  }
+
+  .panel-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .type-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 12px 14px;
+    text-align: left;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: all 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .type-btn:last-child { margin-bottom: 0; }
+
+  .type-btn .t-label {
+    font-size: 13px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .type-btn .t-sub {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .type-btn.active-nrf { border-color: var(--accent-nrf); color: var(--accent-nrf); background: #3b82f608; }
+  .type-btn.active-biz { border-color: var(--accent-biz); color: var(--accent-biz); background: #10b98108; }
+  .type-btn.active-startup { border-color: var(--accent-startup); color: var(--accent-startup); background: #f59e0b08; }
+
+  .mode-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 10px 12px;
+    text-align: left;
+    cursor: pointer;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .mode-btn:last-child { margin-bottom: 0; }
+  .mode-btn .m-icon { font-size: 14px; }
+  .mode-btn .m-text { font-size: 12px; font-weight: 600; }
+  .mode-btn.active { border-color: currentColor; }
+  .mode-btn.active-nrf { color: var(--accent-nrf); }
+  .mode-btn.active-biz { color: var(--accent-biz); }
+  .mode-btn.active-startup { color: var(--accent-startup); }
+
+  .section-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .section-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 10px;
+    font-size: 11px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .section-btn.active { border-color: currentColor; }
+  .section-btn.active-nrf { color: var(--accent-nrf); }
+  .section-btn.active-biz { color: var(--accent-biz); }
+  .section-btn.active-startup { color: var(--accent-startup); }
+
+  /* ── 채팅 영역 ── */
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .chat-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chat-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #f0ede8;
+  }
+
+  .chat-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    margin-top: 2px;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 400px;
+    max-height: 520px;
+  }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+  }
+
+  .msg.user { justify-content: flex-end; }
+
+  .bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .bubble.assistant {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 2px 14px 14px 14px;
+  }
+
+  .bubble.user {
+    background: #f0ede8;
+    color: #0a0a0f;
+    border-radius: 14px 2px 14px 14px;
+  }
+
+  .bubble h1, .bubble h2, .bubble h3 {
+    font-family: 'Noto Serif KR', serif;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    color: #f0ede8;
+  }
+
+  .bubble h1 { font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .bubble h2 { font-size: 14px; }
+  .bubble h3 { font-size: 13px; color: var(--text-dim); }
+  .bubble p { margin: 4px 0; }
+  .bubble ul, .bubble ol { padding-left: 18px; margin: 6px 0; }
+  .bubble li { margin: 3px 0; }
+  .bubble strong { color: #f0ede8; }
+  .bubble table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 12px; }
+  .bubble th { background: var(--border); padding: 6px 10px; text-align: left; }
+  .bubble td { border-top: 1px solid var(--border); padding: 6px 10px; }
+  .bubble code { font-family: 'DM Mono', monospace; font-size: 11px; background: #1a1a2a; padding: 2px 6px; }
+  .bubble pre { background: #1a1a2a; padding: 12px; margin: 8px 0; overflow-x: auto; }
+  .bubble pre code { background: none; padding: 0; }
+
+  .typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    width: fit-content;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* ── 입력 영역 ── */
+  .input-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 14px;
+  }
+
+  .rfp-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 5px 12px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .rfp-box {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 12px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    resize: vertical;
+    margin-bottom: 10px;
+    outline: none;
+  }
+
+  textarea.main-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+  }
+
+  textarea.main-input::placeholder { color: var(--text-muted); }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+
+  .input-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .send-btn {
+    background: #f0ede8;
+    color: #0a0a0f;
+    border: none;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: opacity 0.15s;
+    letter-spacing: 0.05em;
+  }
+
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── 스크롤바 ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+
+  /* ── 반응형 ── */
+  @media (max-width: 768px) {
+    .container { flex-direction: column; }
+    .sidebar { width: 100%; }
+    .messages { max-height: 360px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">제안서 작성 에이전트 <span>/ Build-For-All</span></div>
+  </div>
+  <div class="header-meta">
+    <button class="dl-btn" onclick="exportMd()">⬇ .md 저장</button>
+    <button class="dl-btn" onclick="exportAll()">⬇ 전체 대화</button>
+    <button class="dl-btn" onclick="resetAll()">↺ 처음</button>
+    <span class="badge">AI POWERED</span>
+  </div>
+</header>
+
+<div class="container">
+  <!-- 사이드바 -->
+  <div class="sidebar">
+
+    <!-- 유형 선택 -->
+    <div class="panel">
+      <div class="panel-label">제안서 유형</div>
+      <button class="type-btn active-nrf" onclick="setType('nrf', this)">
+        <span class="t-label">연구 과제 제안서</span>
+        <span class="t-sub" style="color:#3b82f6">NRF · KAIA</span>
+      </button>
+      <button class="type-btn" onclick="setType('biz', this)">
+        <span class="t-label">사업 제안서</span>
+        <span class="t-sub">나라장터 · 지자체</span>
+      </button>
+      <button class="type-btn" onclick="setType('startup', this)">
+        <span class="t-label">창업 제안서</span>
+        <span class="t-sub">모두의창업 · 스타트업</span>
+      </button>
+    </div>
+
+    <!-- 모드 선택 -->
+    <div class="panel">
+      <div class="panel-label">작업 모드</div>
+      <button class="mode-btn active active-nrf" onclick="setMode('new', this)">
+        <span class="m-icon">✦</span>
+        <div>
+          <div class="m-text">신규 작성</div>
+          <div style="font-size:10px;color:var(--text-dim)">단계별 질문으로 초안 생성</div>
+        </div>
+      </button>
+      <button class="mode-btn" onclick="setMode('rfp', this)">
+        <span class="m-icon">◈</span>
+        <div>
+          <div class="m-text">RFP 분석</div>
+          <div style="font-size:10px;color:var(--text-dim)">과업지시서 배점 매핑</div>
+        </div>
+      </button>
+      <button class="mode-btn" onclick="setMode('section', this)">
+        <span class="m-icon">▣</span>
+        <div>
+          <div class="m-text">섹션 개별 작성</div>
+          <div style="font-size:10px;color:var(--text-dim)">서론만·방법론만 등</div>
+        </div>
+      </button>
+      <button class="mode-btn" onclick="setMode('revise', this)">
+        <span class="m-icon">◎</span>
+        <div>
+          <div class="m-text">초고 교정·보완</div>
+          <div style="font-size:10px;color:var(--text-dim)">기존 초안 업로드 후 개선</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- 섹션 선택 (섹션 모드일 때만) -->
+    <div class="panel" id="section-panel" style="display:none">
+      <div class="panel-label">섹션 선택</div>
+      <div class="section-grid" id="section-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- 채팅 영역 -->
+  <div class="chat-area">
+    <div class="chat-header">
+      <div>
+        <div class="chat-title" id="chat-title">연구 과제 제안서 — 신규 작성</div>
+        <div class="chat-sub" id="chat-sub">과제명부터 단계별로 질문합니다 · Ctrl+Enter 전송</div>
+      </div>
+    </div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="input-area">
+      <div id="rfp-area" style="display:none">
+        <button class="rfp-toggle" onclick="toggleRfp()">▼ RFP 원문 붙여넣기</button>
+        <textarea class="rfp-box" id="rfp-text" rows="5" placeholder="과업지시서 전문을 여기에 붙여넣으세요..." style="display:none"></textarea>
+      </div>
+      <textarea class="main-input" id="user-input" rows="3"
+        placeholder="정보를 입력하거나 질문하세요... (Ctrl+Enter 전송)"
+        onkeydown="handleKey(event)"></textarea>
+      <div class="input-row">
+        <span class="input-hint">Ctrl+Enter · 전송</span>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">전송 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 상태 ──────────────────────────────────────────────────────────────────────
+const STATE = {
+  type: 'nrf',
+  mode: 'new',
+  section: null,
+  messages: [],
+  loading: false,
+};
+
+const SECTIONS = {
+  nrf: ['연구 필요성 및 목적','연구 내용 및 방법','연구 추진체계','연구 일정','기대효과 및 활용방안','참고문헌'],
+  biz: ['과업 이해 및 배경','수행방법론','투입인력 구성','추진일정 및 예산','기대효과','RFP 대응 점검표'],
+  startup: ['사업 개요','문제 정의 및 해결방안','시장 분석','사업 모델','팀 구성','자금 계획 및 기대효과'],
+};
+
+const TYPE_LABELS = {
+  nrf: '연구 과제 제안서',
+  biz: '사업 제안서',
+  startup: '창업 제안서',
+};
+
+const MODE_LABELS = {
+  new: '신규 작성',
+  rfp: 'RFP 분석',
+  section: '섹션 개별 작성',
+  revise: '초고 교정·보완',
+};
+
+const ACCENT = {
+  nrf: '#3b82f6',
+  biz: '#10b981',
+  startup: '#f59e0b',
+};
+
+// ── 시스템 프롬프트 ───────────────────────────────────────────────────────────
+function buildSystem() {
+  const typeLabel = TYPE_LABELS[STATE.type];
+  const sections = SECTIONS[STATE.type];
+  return `당신은 한국어 ${typeLabel} 전문 작성 보조 에이전트입니다.
+모드: ${MODE_LABELS[STATE.mode]}${STATE.section ? ' — ' + STATE.section : ''}
+
+지원 섹션: ${sections.join(', ')}
+
+작성 원칙:
+1. 검증된 사실과 사용자가 제공한 데이터에만 근거한다. 임의 수치·출처 생성 금지.
+2. 주관적 판단·미사여구 배제. 건조하고 분석적인 보고체 유지.
+3. 추상적 서술 대신 구체적 방법, 수치, 일정 명시.
+4. 정보가 불충분한 항목은 [TODO: 추가 정보 필요] 플레이스홀더 삽입.
+5. 출력은 마크다운 형식으로 구조화하여 제시한다.
+
+${STATE.mode === 'new' ? '신규 작성 모드: 과제명(또는 사업명)을 먼저 물어보고 단계별로 정보를 수집하여 초안을 생성한다.' : ''}
+${STATE.mode === 'rfp' ? 'RFP 분석 모드: 고배점 항목에 서술 비중을 집중하는 전략을 먼저 제시하고, 과업항목↔제안서 목차 매핑표를 작성한다.' : ''}
+${STATE.mode === 'section' ? `섹션 개별 작성 모드: "${STATE.section || '지정 섹션'}"만 집중 작성한다.` : ''}
+${STATE.mode === 'revise' ? '초고 교정 모드: 문체 오류·논리 비약·근거 누락을 [교정] 태그로 명시하고 교정 전·후를 비교 제시한다.' : ''}`;
+}
+
+// ── UI 업데이트 ───────────────────────────────────────────────────────────────
+function updateHeader() {
+  const t = document.getElementById('chat-title');
+  const s = document.getElementById('chat-sub');
+  t.textContent = `${TYPE_LABELS[STATE.type]} — ${MODE_LABELS[STATE.mode]}${STATE.section ? ' · ' + STATE.section : ''}`;
+  s.textContent = STATE.mode === 'rfp'
+    ? 'RFP 원문 붙여넣기 후 전송 · Ctrl+Enter'
+    : '정보를 입력하거나 질문하세요 · Ctrl+Enter 전송';
+  document.getElementById('rfp-area').style.display = STATE.mode === 'rfp' ? 'block' : 'none';
+  document.getElementById('section-panel').style.display = STATE.mode === 'section' ? 'block' : 'none';
+  if (STATE.mode === 'section') renderSections();
+}
+
+function renderSections() {
+  const grid = document.getElementById('section-grid');
+  grid.innerHTML = '';
+  SECTIONS[STATE.type].forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'section-btn' + (STATE.section === s ? ` active active-${STATE.type}` : '');
+    btn.textContent = s;
+    btn.onclick = () => {
+      STATE.section = s;
+      renderSections();
+      updateHeader();
+    };
+    grid.appendChild(btn);
+  });
+}
+
+// ── 이벤트 핸들러 ─────────────────────────────────────────────────────────────
+function setType(type, el) {
+  STATE.type = type;
+  STATE.section = null;
+  document.querySelectorAll('.type-btn').forEach(b => b.className = 'type-btn');
+  el.classList.add('active-' + type);
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.className = 'mode-btn' + (b.dataset.mode === STATE.mode ? ` active active-${type}` : '');
+  });
+  updateHeader();
+  startConversation();
+}
+
+function setMode(mode, el) {
+  STATE.mode = mode;
+  el.dataset.mode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.className = 'mode-btn' + (b === el ? ` active active-${STATE.type}` : '');
+  });
+  updateHeader();
+  startConversation();
+}
+
+function toggleRfp() {
+  const box = document.getElementById('rfp-text');
+  const btn = document.querySelector('.rfp-toggle');
+  const show = box.style.display === 'none';
+  box.style.display = show ? 'block' : 'none';
+  btn.textContent = show ? '▲ RFP 입력 닫기' : '▼ RFP 원문 붙여넣기';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+// ── 대화 시작 ────────────────────────────────────────────────────────────────
+function startConversation() {
+  STATE.messages = [];
+  const greetings = {
+    new: `**${TYPE_LABELS[STATE.type]} 신규 작성**을 시작합니다.\n\n단계별 질문으로 정보를 수집한 후 초안을 생성합니다.\n\n**먼저, 과제명(또는 사업명)을 알려주세요.**`,
+    rfp: `**RFP 분석 모드**입니다.\n\n과업지시서 전문을 RFP 입력란에 붙여넣기 후 전송해 주세요.\n배점표 자동 매핑 및 섹션별 대응 전략을 제시합니다.`,
+    section: `**섹션 개별 작성 모드**입니다.\n\n왼쪽에서 작성할 섹션을 선택하신 후, 해당 섹션에 필요한 핵심 정보를 알려주세요.`,
+    revise: `**초고 교정·보완 모드**입니다.\n\n교정할 초안 텍스트를 붙여넣어 주세요.\n문체 오류, 논리 비약, 근거 누락을 분석하여 교정 결과를 제시합니다.`,
+  };
+  addMessage('assistant', greetings[STATE.mode]);
+}
+
+// ── 메시지 렌더링 ─────────────────────────────────────────────────────────────
+function addMessage(role, content) {
+  STATE.messages.push({ role, content });
+  renderMessages();
+}
+
+function renderMessages() {
+  const container = document.getElementById('messages');
+  container.innerHTML = '';
+  STATE.messages.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'msg ' + msg.role;
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble ' + msg.role;
+    if (msg.role === 'assistant') {
+      bubble.innerHTML = parseMarkdown(msg.content);
+    } else {
+      bubble.style.whiteSpace = 'pre-wrap';
+      bubble.textContent = msg.content;
+    }
+    div.appendChild(bubble);
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const container = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+// ── 마크다운 파서 ─────────────────────────────────────────────────────────────
+function parseMarkdown(text) {
+  return text
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[hul]|<\/[hul]|<li|<\/li)(.+)$/gm, '<p>$1</p>')
+    .replace(/\[TODO([^\]]*)\]/g, '<span style="color:#f59e0b;font-family:DM Mono,monospace;font-size:11px">[TODO$1]</span>');
+}
+
+// ── API 호출 ─────────────────────────────────────────────────────────────────
+async function sendMessage() {
+  if (STATE.loading) return;
+  const input = document.getElementById('user-input');
+  const rfpText = document.getElementById('rfp-text');
+  const userText = input.value.trim();
+  const rfpContent = rfpText ? rfpText.value.trim() : '';
+  if (!userText && !rfpContent) return;
+
+  const content = rfpContent
+    ? `[RFP 원문]\n${rfpContent}\n\n[추가 지시]\n${userText}`
+    : userText;
+
+  addMessage('user', content);
+  input.value = '';
+  if (rfpText) rfpText.value = '';
+
+  STATE.loading = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+
+  const apiMessages = STATE.messages.slice(0, -1).map(m => ({ role: m.role, content: m.content }));
+  apiMessages.push({ role: 'user', content });
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: buildSystem(),
+        stream: true,
+        messages: apiMessages,
+      }),
+    });
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let full = '';
+    removeTyping();
+
+    // 스트리밍 버블 추가
+    const container = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'msg assistant';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble assistant';
+    div.appendChild(bubble);
+    container.appendChild(div);
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      for (const line of decoder.decode(value).split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const d = JSON.parse(line.slice(6));
+          if (d.type === 'content_block_delta' && d.delta?.text) {
+            full += d.delta.text;
+            bubble.innerHTML = parseMarkdown(full);
+            container.scrollTop = container.scrollHeight;
+          }
+        } catch {}
+      }
+    }
+    STATE.messages.push({ role: 'assistant', content: full });
+  } catch (e) {
+    removeTyping();
+    addMessage('assistant', `오류가 발생했습니다: ${e.message}`);
+  } finally {
+    STATE.loading = false;
+    document.getElementById('send-btn').disabled = false;
+  }
+}
+
+// ── 다운로드 ─────────────────────────────────────────────────────────────────
+function downloadFile(content, filename) {
+  const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(blob),
+    download: filename,
+  });
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportMd() {
+  const last = [...STATE.messages].reverse().find(m => m.role === 'assistant');
+  if (!last) return alert('아직 생성된 내용이 없습니다.');
+  const date = new Date().toISOString().slice(0, 10);
+  downloadFile(last.content, `${TYPE_LABELS[STATE.type]}_${date}.md`);
+}
+
+function exportAll() {
+  if (!STATE.messages.length) return alert('대화 내용이 없습니다.');
+  const content = STATE.messages
+    .map(m => `## ${m.role === 'user' ? '사용자' : '에이전트'}\n\n${m.content}`)
+    .join('\n\n---\n\n');
+  const date = new Date().toISOString().slice(0, 10);
+  downloadFile(content, `제안서_전체대화_${date}.md`);
+}
+
+function resetAll() {
+  STATE.section = null;
+  updateHeader();
+  startConversation();
+}
+
+// ── 초기화 ───────────────────────────────────────────────────────────────────
+document.querySelectorAll('.mode-btn').forEach((btn, i) => {
+  const modes = ['new', 'rfp', 'section', 'revise'];
+  btn.dataset.mode = modes[i];
+});
+
+updateHeader();
+startConversation();
+</script>
+</body>
+</html>
